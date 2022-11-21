@@ -23,6 +23,10 @@ nvim(){
     PATH=$PATH:/runs/simrun_tav/libs/bin LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/runs/simrun_tav/libs/lib/ /runs/simrun_tav/libs/bin/nvim $*
 }
 
+nvim_dev(){
+    PATH=$PATH:/runs/simrun_tav/libs/bin LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/runs/simrun_tav/libs/lib/ /runs/simrun_tav/libs/bin/nvim --cmd "set runtimepath^=~/.config/nvim_lua/" -u ~/.config/nvim_lua/init.lua $*
+}
+
 gnvim(){
     PATH=$PATH:/runs/simrun_tav/libs/bin /runs/simrun_tav/libs/bin/goneovim $* > /dev/null 2>&1 & disown
 }
@@ -120,6 +124,25 @@ tb_last_modified(){
     for dir in $(find $1 -mindepth 1 -maxdepth 1 -type d ! -wholename "$1/log*"); do find $dir -type f -cmin -$2; done
 }
 
+curr_cl_num(){
+    p4 changes -m1 ./...#have | grep --only-matching "Change [0-9]*" | grep --only-matching "[0-9]*"
+}
+
+find_curr_cl_hash(){
+    git log --grep $(curr_cl_num)
+}
+ 
+cleanup_vim(){
+    rm -rfv ~/.vim ~/.tmux ~/.oh-my-zsh ~/.fzf ~/.local/share/nvim ~/.config/nvim ~/term_nvim_setup
+}
+
+lazygit(){
+    /runs/simrun_tav/libs/bin/lazygit $*
+}
+
+fd(){
+    /runs/simrun_tav/libs/bin/fd $*
+}
 
 if [ -z $ZSH_VERSION ]; then
     [ -f ~/.fzf.bash ] && source ~/.fzf.bash
@@ -128,9 +151,10 @@ if [ -z $ZSH_VERSION ]; then
 fi
 
 
+
 alias ag='/runs/simrun_tav/libs/bin/ag --hidden'
 alias ctags="/runs/simrun_tav/libs/bin/ctags"
-alias curr_cl="p4 changes -m1 ./...#have"
+alias curr_cl="p4 changes -m1 -L ./...#have"
 alias fugitive="nvim -c :Git"
 alias glog="git log --graph --decorate --oneline --simplify-by-decoration"
 alias glog_full="git log --graph --decorate --oneline"
@@ -140,11 +164,17 @@ alias djinji="/runs/simrun_tav/tav_dev/jira_djinji/djinji/run_djinji.sh"
 alias djinji_cli="/runs/simrun_tav/tav_dev/jira_djinji/djinji/run_djinji_cli.sh"
 alias bvim="vim --noplugin "
 alias lsfdash="lsfdash > /dev/null 2>&1 & disown"
+alias vdmt="vdmt -m > /dev/null 2>&1 & disown"
 alias p4v="p4v & disown"
 alias lst="ls -ltrah"
 alias ll="ls -lah"
+alias n=nvim
+alias nd=nvim_dev
+alias lg=lazygit
+alias git-lfs=/runs/simrun_tav/libs/bin/git-lfs
 export P4EDITOR=/usr/bin/vim
 export PATH=$PATH:$HOME/.local/bin/:/runs/simrun_tav/tav_dev/bin
 export TERM=screen-256color
 export VISUAL=/usr/bin/vim
 export EDITOR="$VISUAL"
+export FZF_CTRL_R_OPTS="${FZF_CTRL_R_OPTS:+$FZF_CTRL_R_OPTS }--preview 'echo {}' --preview-window down:5:hidden:wrap --bind '?:toggle-preview'"
