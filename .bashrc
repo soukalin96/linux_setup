@@ -7,12 +7,17 @@ source /cde/prod/SM/setup/.bashrc.cde
 #vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
 br(){
-buildreport -rnl $1 $* | grep -v " / "
+    buildreport -rnl $1 $* | grep -v " / "
 }
 
-path(){
-readlink -f $1
+
+nbr(){
+    buildreport -rnl $1 $* | grep -v " / " >| br.txt && nvim br.txt
 }
+
+# path(){
+#     readlink -f $1 | xclip -sel clip
+# }
 
 set_p4client(){
     cmd_str=$(cat .p4config)
@@ -40,7 +45,7 @@ rg(){
 }
 
 dolphin(){
-     /usr/bin/dolphin $* > /dev/null 2>&1 &
+    /usr/bin/dolphin $* > /dev/null 2>&1 &
 }
 
 find_my_usage(){
@@ -96,7 +101,7 @@ multidu(){
 
 
 get_ignore(){
-    scp hyldlog4:/runs/simrun_tav/tav_dev/.config/.ignore .
+    scp hyldlog28:/runs/simrun_tav/tav_dev/.config/.ignore .
 }
 
 ftmux() {
@@ -105,15 +110,6 @@ ftmux() {
 
 fbr() {
     buildreport -rnl $(ls -ltd log*/ | fzf --no-sort) $*
-}
-
-get_rand_hash() {
-    export RANDOM_HASHCODE=$(openssl rand -hex 20)
-}
-
-vsim_snap() {
-    mkdir snapshots > /dev/null 2>&1
-    get_rand_hash && vsim -s snapshots/${RANDOM_HASHCODE}.tar $*
 }
 
 update_my_term(){
@@ -131,7 +127,7 @@ curr_cl_num(){
 find_curr_cl_hash(){
     git log --grep $(curr_cl_num)
 }
- 
+
 cleanup_vim(){
     rm -rfv ~/.vim ~/.tmux ~/.oh-my-zsh ~/.fzf ~/.local/share/nvim ~/.config/nvim ~/term_nvim_setup
 }
@@ -144,15 +140,22 @@ fd(){
     /runs/simrun_tav/libs/bin/fd $*
 }
 
+cmd_grep(){
+    rg "vsim_cmd" $1/vsim.log
+}
+
+nr(){
+    nvim "+silent RestoreSession"
+}
+
 if [ -z $ZSH_VERSION ]; then
     [ -f ~/.fzf.bash ] && source ~/.fzf.bash
     alias cmdline_long="export PS1='\[\033[0;35m\][\!:\h \[\033[0;33m\]\w]\[\033[00m\]: '"
     alias cmdline_short="export PS1='\[\033[0;35m\][\!:\h \[\033[0;33m\]\W]\[\033[00m\]: '"
 fi
 
-
-
 alias ag='/runs/simrun_tav/libs/bin/ag --hidden'
+alias cg='cmd_grep'
 alias ctags="/runs/simrun_tav/libs/bin/ctags"
 alias curr_cl="p4 changes -m1 -L ./...#have"
 alias fugitive="nvim -c :Git"
@@ -162,19 +165,23 @@ alias lsof=/usr/sbin/lsof
 alias reset_term="env -i HOME="$HOME" bash -l "
 alias djinji="/runs/simrun_tav/tav_dev/jira_djinji/djinji/run_djinji.sh"
 alias djinji_cli="/runs/simrun_tav/tav_dev/jira_djinji/djinji/run_djinji_cli.sh"
-alias bvim="vim --noplugin "
 alias lsfdash="lsfdash > /dev/null 2>&1 & disown"
 alias vdmt="vdmt -m > /dev/null 2>&1 & disown"
 alias p4v="p4v & disown"
-alias lst="ls -ltrah"
-alias ll="ls -lah"
 alias n=nvim
-alias nd=nvim_dev
 alias lg=lazygit
 alias git-lfs=/runs/simrun_tav/libs/bin/git-lfs
 export P4EDITOR=/usr/bin/vim
-export PATH=$PATH:$HOME/.local/bin/:/runs/simrun_tav/tav_dev/bin
+export PATH=/runs/simrun_tav/libs/tmux_sandbox/actual_bin:$HOME/.local/bin/:$PATH:/runs/simrun_tav/tav_dev/bin
 export TERM=screen-256color
 export VISUAL=/usr/bin/vim
 export EDITOR="$VISUAL"
 export FZF_CTRL_R_OPTS="${FZF_CTRL_R_OPTS:+$FZF_CTRL_R_OPTS }--preview 'echo {}' --preview-window down:5:hidden:wrap --bind '?:toggle-preview'"
+#source user customization
+if [ -f ~/my_nvim/.mybashrc ]; then
+    source ~/my_nvim/.mybashrc
+fi
+. "$HOME/.cargo/env"
+
+
+
