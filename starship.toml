@@ -1,0 +1,153 @@
+# format = """
+# (bg:#769ff0 fg:#a3aed2)\
+# $directory\
+# [on](red) \
+# (fg:#769ff0 bg:#394260)\
+# $git_branch\
+# $git_commit\
+# $git_status\
+# (fg:#394260 bg:#212736)\
+# $nodejs\
+# $rust\
+# $golang\
+# $php\
+# $character"""
+
+format = '''[┌──────────────────>](fg:cyan bold) $directory${custom.foo} $rust$lua$package 
+[└─](fg:bold cyan)$git_branch$git_commit$git_status$character '''
+
+# Wait 10 milliseconds for starship to check files under the current directory.
+scan_timeout = 10
+
+# Disable the blank line at the start of the prompt
+add_newline = true
+
+right_format = """
+$cmd_duration\
+${custom.ncrunver}${custom.error}\
+"""
+
+[os]
+format = "on [($name )]($style)"
+style = "bold blue"
+disabled = false
+
+continuation_prompt = '▶▶ '
+
+# [character]
+# format = "[ >> ](fg:cyan bg:#000000)"
+# success_symbol = '[➜](bold green)' # The 'success_symbol' segment is being set to '➜' with the color 'bold green'
+# error_symbol = "[✖](bold red) "
+
+[directory]
+truncation_length = 6
+truncation_symbol = ""
+repo_root_style = "fg:Yellow bold"
+repo_root_format = '[$repo_root]($repo_root_style)[$path](fg:cyan bold)[$read_only]($read_only_style) '
+
+[custom.xrun]
+command = 'echo foo' # shows output of command
+format = ' transcending [$output]($style)'
+disabled = false
+
+[shell]
+fish_indicator = ''
+powershell_indicator = '_'
+unknown_indicator = 'mystery shell'
+style = 'cyan bold'
+disabled = false
+
+[status]
+style = 'fg:black bold bg:blue'
+symbol = 'x'
+success_symbol = 'o'
+format = '[\[$symbol$common_meaning$signal_name$maybe_int\]]($style) '
+map_symbol = true
+disabled = false
+
+[username]
+style_user = 'white bold'
+style_root = 'black bold'
+format = '[$user]($style) '
+disabled = false
+show_always = true
+
+[directory.substitutions]
+"Documents" = " "
+"Downloads" = " "
+"Music" = " "
+"Pictures" = " "
+"verilog.e5ca." = '[TB](fg:green)'
+
+[git_branch]
+symbol = ""
+style = ""
+format = '[[ $symbol $branch ](fg:green dimmed)]($style)'
+
+[git_status]
+style = ""
+format = '[[($all_status$ahead_behind )](fg:red dimmed)]($style)'
+
+[nodejs]
+symbol = ""
+style = "bg:#212736"
+format = '[[ $symbol ($version) ](fg:#769ff0 bg:#212736)]($style)'
+
+[rust]
+symbol = ""
+style = "bg:#212736"
+format = '[[ $symbol ($version) ](fg:#769ff0 bg:#212736)]($style)'
+
+[golang]
+symbol = "ﳑ"
+style = "bg:#212736"
+format = '[[ $symbol ($version) ](fg:#769ff0 bg:#212736)]($style)'
+
+[php]
+symbol = ""
+style = "bg:#212736"
+format = '[[ $symbol ($version) ](fg:#769ff0 bg:#212736)]($style)'
+
+[time]
+disabled = false
+time_format = "%R" # Hour:Minute Format
+style = ""
+format = '[[  $time ](fg:#a0a9cb)]($style)'
+
+[lua]
+format = 'via [lua](bold green) [$version](bold blue) '
+
+# ~/.config/starship.toml
+
+[cmd_duration]
+min_time = 100
+show_milliseconds = true
+show_notifications	= true
+format = '[took [$duration](fg:yellow bold) ](fg:white)'
+
+[custom.foo]
+command = '/home/soukaling/term_nvim_setup/xrunv.sh' # shows output of command
+detect_files = ['.vsimrc'] # can specify filters but wildcards are not supported
+format = '[via [$output ](fg:green dimmed)](fg:white dimmed) '
+shell = "zsh"
+
+[custom.error]
+command = 'echo Error.rpt $(rg Passed Error.rpt | grep -Eo "[0-9]{1,}")/$(rg Failed Error.rpt | grep -Eo "[0-9]{1,}")' # shows output of command
+detect_files = ['Error.rpt'] # can specify filters but wildcards are not supported
+format = '[$output ](fg:green bold)'
+shell = "zsh"
+
+[custom.ncrunver]
+command = 'echo pattern ran on $(head -n 1 ncverilog.log | cut -d ":" -f 2 )' # shows output of command
+detect_files = ['ncverilog.log'] # can specify filters but wildcards are not supported
+format = '<< [$output ](fg:red bold)'
+shell = "zsh"
+
+[custom.tree]
+command = 'ls | tree -C -d -L 1 | head -10' # shows output of command
+# detect_files = ['ncverilog.log'] # can specify filters but wildcards are not supported
+when = true
+format = ' [$output ](fg:red bold)'
+shell = "zsh"
+
+
